@@ -20,6 +20,15 @@ import (
 	"github.com/spf13/cobra"
 )
 
+type Options struct {
+	optint int
+	optstr string
+}
+
+var (
+	o = &Options{}
+)
+
 // serveCmd represents the serve command
 var serveCmd = &cobra.Command{
 	Use:   "serve",
@@ -31,12 +40,15 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("serve called")
+		fmt.Printf("serve called: optint: %d, optstr: %s", o.optint, o.optstr)
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(serveCmd)
+
+	serveCmd.Flags().IntVarP(&o.optint, "int", "i", 0, "int option")
+	serveCmd.Flags().StringVarP(&o.optstr, "str", "s", "default", "string option")
 
 	// Here you will define your flags and configuration settings.
 
