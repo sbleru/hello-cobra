@@ -3,8 +3,9 @@ package cmd
 import (
 	"bytes"
 	"fmt"
-	"strings"
 	"testing"
+
+	"github.com/mattn/go-shellwords"
 )
 
 func TestServe(t *testing.T) {
@@ -17,13 +18,17 @@ func TestServe(t *testing.T) {
 		{command: "helloCobra serve --str test", want: "serve called: optint: 0, optstr: test"},
 		{command: "helloCobra config", want: "config called"},
 		{command: "helloCobra config create", want: "create called"},
+		{command: "helloCobra serve --str \"test1 test2\"", want: "serve called: optint: 0, optstr: test1 test2"},
 	}
 
 	for _, c := range cases {
 		buf := new(bytes.Buffer)
 		cmd := NewCmdRoot()
 		cmd.SetOutput(buf)
-		cmdArgs := strings.Split(c.command, " ")
+		cmdArgs, err := shellwords.Parse(c.command)
+		if err != nil {
+			t.Fatalf("args parse error: %+v\n", err)
+		}
 		fmt.Printf("cmdArgs %+v\n", cmdArgs)
 		cmd.SetArgs(cmdArgs[1:])
 		cmd.Execute()
