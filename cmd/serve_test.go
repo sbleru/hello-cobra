@@ -12,10 +12,10 @@ func TestServe(t *testing.T) {
 	cases := []struct {
 		command string
 		want    string
+		errWant string
 	}{
-		{command: "helloCobra serve", want: "serve called: optint: 0, optstr: default"},
-		{command: "helloCobra serve --int 10", want: "serve called: optint: 10, optstr: default"},
-		{command: "helloCobra serve --str test", want: "serve called: optint: 0, optstr: test"},
+		{command: "helloCobra serve", want: "", errWant: "Parameter error: Optstr is required"},
+		{command: "helloCobra serve --int 10", want: "", errWant: "Parameter error: Optstr is required"},
 		{command: "helloCobra config", want: "config called"},
 		{command: "helloCobra config create", want: "create called"},
 		{command: "helloCobra serve --str \"test1 test2\"", want: "serve called: optint: 0, optstr: test1 test2"},
@@ -31,7 +31,11 @@ func TestServe(t *testing.T) {
 		}
 		fmt.Printf("cmdArgs %+v\n", cmdArgs)
 		cmd.SetArgs(cmdArgs[1:])
-		cmd.Execute()
+		if err := cmd.Execute(); err != nil {
+			if c.errWant != err.Error() {
+				t.Errorf("unexpected error response: errWant:%+v, get:%+v", c.errWant, err.Error())
+			}
+		}
 
 		get := buf.String()
 		if c.want != get {
